@@ -1,0 +1,18 @@
+List of city- done
+list of restaurent - done
+list of cuisine- done
+list of mealtype -done
+Post the order
+Get All Orders - done
+
+///////////////////////////////
+Rest on the basis of city -done
+Rest on the basis of meal type
+Rest details
+Rest on the basis of cuisine and mealtype
+Rest on the basis of cost  and mealtype
+Rest on the basis of city  and mealtype
+
+npm i express cors mongodb body-parser
+
+cross origin resource sharing

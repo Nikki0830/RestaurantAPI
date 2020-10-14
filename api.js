@@ -11,9 +11,12 @@ var db;
 app.use(cors());
 
 
-/*app.get('/health',(req,res) => {
-    res.send("Api is working");
-})*/
+app.use(bodyParser.urlencoded({extended:true}));
+app.use(bodyParser.json())
+
+app.get('/health',(req,res) => {
+    res.send("Api is working")
+});
 
 app.get('/',(req,res) => {
     res.send(`<a href="http://localhost:5500/location" target="_blank">City</a> </br>
@@ -46,12 +49,62 @@ app.get('/cusn',(req,res) => {
     })
 })
 
+//restaurant
 app.get('/rest',(req,res) => {
-    db.collection('restaurant').find({}).toArray((err,output) => {
+    var condition = {};
+    if(req.query.city && req.query.mealtype){
+        condition = {city:req.query.city,"type.mealtype":req.query.mealtype}
+    }
+    else if(req.query.city){
+        condition={city:req.query.city}
+    } else if(req.query.mealtype){
+        condition={"type.mealtype":req.query.mealtype}
+    }
+    else{
+        condition={}
+    }
+    db.collection('restaurant').find(condition).toArray((err,result) => {
         if(err) throw err;
-        res.send(output);
+        res.send(result)
     })
 })
+
+//RestaurentDetai+
+app.get('/restaurantdetails/:id',(req,res) => {
+    var query = {_id:req.params.id}
+    db.collection('restaurant').find(query).toArray((err,result) => {
+        res.send(result)
+    })
+})
+
+//RestaurantList
+app.get('/restaurantList/:mealtype',(req,res) => {
+    var condition = {};
+    if(req.query.cuisine){
+        condition={"type.mealtype":req.params.mealtype,"Cuisine.cuisine":req.query.cuisine}
+    }else if(req.query.city){
+        condition={"type.mealtype":req.params.mealtype,city:req.query.city}
+    }else if(req.query.lcost && req.query.hcost){
+        condition={"type.mealtype":req.params.mealtype,cost:{$lt:Number(req.query.hcost),$gt:Number(req.query.lcost)}}
+    }
+    else{
+        condition= {"type.mealtype":req.params.mealtype}
+    }
+    db.collection('restaurant').find(condition).toArray((err,result) => {
+        if(err) throw err;
+        res.send(result)
+    })
+})
+
+//PlaceOrder
+app.post('/placeorder',(req,res) => {
+    console.log(req.body);
+    db.collection('orders').insert(req.body,(err,result) => {
+        if(err) throw err;
+        res.send('posted')
+    })
+})
+
 app.get('/order',(req,res) => {
     db.collection('orders').find({}).toArray((err,output) => {
         if(err) throw err;

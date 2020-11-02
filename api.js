@@ -80,21 +80,26 @@ app.get('/restaurantdetails/:id',(req,res) => {
 //RestaurantList
 app.get('/restaurantList/:mealtype',(req,res) => {
     var condition = {};
+    var sort={cost:1}
     if(req.query.cuisine){
         condition={"type.mealtype":req.params.mealtype,"Cuisine.cuisine":req.query.cuisine}
     }else if(req.query.city){
         condition={"type.mealtype":req.params.mealtype,city:req.query.city}
     }else if(req.query.lcost && req.query.hcost){
         condition={"type.mealtype":req.params.mealtype,cost:{$lt:Number(req.query.hcost),$gt:Number(req.query.lcost)}}
+    }else if(req.query.sort){
+        condition={"type.mealtype":req.params.mealtype}
+        sort={cost:Number(req.query.sort)}
     }
     else{
         condition= {"type.mealtype":req.params.mealtype}
     }
-    db.collection('restaurant').find(condition).toArray((err,result) => {
+    db.collection('restaurant').find(condition).sort(sort).toArray((err,result) => {
         if(err) throw err;
         res.send(result)
     })
 })
+
 
 //PlaceOrder
 app.post('/placeorder',(req,res) => {
